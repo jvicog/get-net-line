@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jvico-ga <jvico-ga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/17 17:27:32 by jvico-ga          #+#    #+#             */
-/*   Updated: 2022/02/19 16:27:41 by jvico-ga         ###   ########.fr       */
+/*   Updated: 2022/02/19 13:35:46 by jvico-ga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*ft_line(char *str)
 {
@@ -44,30 +44,30 @@ char	*ft_clean(char *str, char *content)
 
 char	*get_next_line(int fd)
 {
-	static char	*content;
+	static char	*content[65535];
 	char		*str;
 	int			bytes;
 
-	if (!get_next_line_aux(&content, &str))
+	if (fd < 0 || fd > 65535 || !get_next_line_aux(&content[fd], &str))
 		return (NULL);
-	while (!ft_new_line(content))
+	while (!ft_new_line(content[fd]))
 	{
 		bytes = read(fd, str, BUFFER_SIZE);
 		if (bytes <= 0)
 			break ;
 		str[bytes] = '\0';
-		content = ft_strjoin (content, str);
+		content[fd] = ft_strjoin (content[fd], str);
 	}
-	if (str != NULL && content != NULL)
+	if (str != NULL && content[fd] != NULL)
 	{
 		free (str);
-		str = ft_line (content);
-		content = ft_clean (str, content);
+		str = ft_line (content[fd]);
+		content[fd] = ft_clean (str, content[fd]);
 		return (str);
 	}
 	if (str != NULL)
 		free(str);
-	free (content);
+	free (content[fd]);
 	return (NULL);
 }
 
